@@ -13,7 +13,10 @@ def getitem(M, k):
     0
     """
     assert k[0] in M.D[0] and k[1] in M.D[1]
-    pass
+    if k in M.f:
+        return M.f[k]
+    else:
+        return 0
 
 def equal(A, B):
     """
@@ -39,7 +42,7 @@ def equal(A, B):
     True
     """
     assert A.D == B.D
-    pass
+    return all([A[(d0, d1)] == B[(d0, d1)] for d0 in A.D[0] for d1 in A.D[1]])
 
 def setitem(M, k, val):
     """
@@ -59,7 +62,8 @@ def setitem(M, k, val):
     True
     """
     assert k[0] in M.D[0] and k[1] in M.D[1]
-    pass
+    if val != 0:
+        M.f[k] = val
 
 def add(A, B):
     """
@@ -87,7 +91,7 @@ def add(A, B):
     True
     """
     assert A.D == B.D
-    pass
+    return Mat(A.D, {(d0, d1): A[(d0, d1)] + B[(d0, d1)] for d0 in A.D[0] for d1 in A.D[1]})
 
 def scalar_mul(M, x):
     """
@@ -101,7 +105,7 @@ def scalar_mul(M, x):
     >>> 0.25*M == Mat(({1,3,5}, {2,4}), {(1,2):1.0, (5,4):0.5, (3,4):0.75})
     True
     """
-    pass
+    return Mat(M.D, {(d0, d1): x * getitem(M, (d0, d1)) for d0 in M.D[0] for d1 in M.D[1]})
 
 def transpose(M):
     """
@@ -115,7 +119,7 @@ def transpose(M):
     >>> M.transpose() == Mt
     True
     """
-    pass
+    return Mat((M.D[1], M.D[0]), {(d1, d0): M[(d0, d1)] for d0 in M.D[0] for d1 in M.D[1]})
 
 def vector_matrix_mul(v, M):
     """
@@ -142,7 +146,7 @@ def vector_matrix_mul(v, M):
     True
     """
     assert M.D[0] == v.D
-    pass
+    return Vec(M.D[1], {d1: sum([M[(d0, d1)] * v[d0] for d0 in M.D[0]]) for d1 in M.D[1]})
 
 def matrix_vector_mul(M, v):
     """
@@ -169,7 +173,7 @@ def matrix_vector_mul(M, v):
     True
     """
     assert M.D[1] == v.D
-    pass
+    return Vec(M.D[0], {d0: sum([M[(d0, d1)] * v[d1] for d1 in M.D[1]]) for d0 in M.D[0]})
 
 def matrix_matrix_mul(A, B):
     """
@@ -198,7 +202,10 @@ def matrix_matrix_mul(A, B):
     True
     """
     assert A.D[1] == B.D[0]
-    pass
+    D = (A.D[0], B.D[1])
+    filter_zero = lambda x: x != 0
+    f_zero = {(a0, b1): sum([A[(a0, a1)] * B[(a1, b1)] for a1 in A.D[1]]) for a0 in A.D[0] for b1 in B.D[1]}
+    return Mat(D, {k: v for k,v in f_zero.items() if filter_zero(v)})
 
 ################################################################################
 
